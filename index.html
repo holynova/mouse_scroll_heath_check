@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>鼠标滚轮故障检测器 | Mouse Wheel Malfunction Detector</title>
+    <style>
+        :root {
+            --primary-color: #337ab7;
+            --hover-color: #286090;
+            --border-color: #ccc;
+            --bg-color: #f9f9f9;
+            --error-color: #d9534f;
+            --success-color: #5cb85c;
+            --warning-color: #ff9800;
+            --instruction-bg: #fffacd;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .language-switcher {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 100;
+        }
+        
+        .language-btn {
+            padding: 5px 10px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .language-btn:hover {
+            background: var(--hover-color);
+        }
+        
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+        
+        .left-panel {
+            width: 30%;
+            min-width: 300px;
+            max-width: 400px;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 20px;
+            border-right: 1px solid var(--border-color);
+        }
+        
+        .right-panel {
+            flex-grow: 1;
+            height: 100vh;
+            overflow-y: auto;
+            position: relative;
+            background-color: var(--bg-color);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        
+        .instruction {
+            background-color: var(--instruction-bg);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .instruction h2 {
+            margin-bottom: 10px;
+        }
+        
+        .instruction ol {
+            padding-left: 20px;
+        }
+        
+        .start-test {
+            display: block;
+            width: 100%;
+            margin: 20px 0;
+            padding: 10px 20px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        .start-test:hover {
+            background-color: var(--hover-color);
+        }
+        
+        .status-indicator {
+            text-align: center;
+            margin: 15px 0;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        
+        .testing {
+            color: var(--warning-color);
+        }
+        
+        .stats {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #f0f0f0;
+            border-radius: 8px;
+        }
+        
+        .log-container {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            max-height: 200px;
+            overflow-y: auto;
+            background-color: #fff;
+        }
+        
+        .error {
+            color: var(--error-color);
+            font-weight: bold;
+        }
+        
+        .normal {
+            color: var(--success-color);
+        }
+        
+        .content-item {
+            padding: 20px;
+            border-bottom: 1px dashed var(--border-color);
+        }
+        
+        .test-area-header {
+            position: sticky;
+            top: 0;
+            background-color: rgba(249, 249, 249, 0.9);
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+            z-index: 10;
+        }
+    </style>
+</head>
+<body>
+    <div class="language-switcher">
+        <button id="toggleLanguage" class="language-btn" data-lang="zh">English</button>
+    </div>
+    
+    <div class="container">
+        <div class="left-panel">
+            <h1 class="lang-zh">鼠标滚轮故障检测器</h1>
+            <h1 class="lang-en" style="display: none;">Mouse Wheel Malfunction Detector</h1>
+            
+            <div class="instruction">
+                <h2 class="lang-zh">使用说明：</h2>
+                <h2 class="lang-en" style="display: none;">Instructions:</h2>
+                
+                <ol class="lang-zh">
+                    <li>点击"开始测试"按钮启动监测</li>
+                    <li>在右侧的测试区域内上下滚动鼠标</li>
+                    <li>尝试保持一个方向的滚动（向上或向下）</li>
+                    <li>如果滚动方向与预期相反，系统会记录为"回滚"故障</li>
+                    <li>您可以查看统计数据和详细日志来分析鼠标滚轮的状况</li>
+                </ol>
+                
+                <ol class="lang-en" style="display: none;">
+                    <li>Click the "Start Test" button to begin monitoring</li>
+                    <li>Scroll up and down in the test area on the right</li>
+                    <li>Try to maintain scrolling in one direction (up or down)</li>
+                    <li>If the scroll direction changes unexpectedly, the system will record it as a "backscroll" malfunction</li>
+                    <li>You can view statistics and detailed logs to analyze your mouse wheel's condition</li>
+                </ol>
+            </div>
+            
+            <button class="start-test lang-zh" id="startTest">开始测试</button>
+            <button class="start-test lang-en" id="startTestEn" style="display: none;">Start Test</button>
+            
+            <div class="status-indicator" id="statusIndicator">
+                <span class="lang-zh">未开始测试</span>
+                <span class="lang-en" style="display: none;">Test not started</span>
+            </div>
+            
+            <div class="stats">
+                <h3 class="lang-zh">测试统计</h3>
+                <h3 class="lang-en" style="display: none;">Test Statistics</h3>
+                
+                <p class="lang-zh">总滚动次数: <span id="totalEvents">0</span></p>
+                <p class="lang-en" style="display: none;">Total scroll events: <span id="totalEventsEn">0</span></p>
+                
+                <p class="lang-zh">正常滚动次数: <span id="normalEvents">0</span></p>
+                <p class="lang-en" style="display: none;">Normal scroll events: <span id="normalEventsEn">0</span></p>
+                
+                <p class="lang-zh">检测到的回滚次数: <span id="abnormalEvents">0</span></p>
+                <p class="lang-en" style="display: none;">Detected backscroll events: <span id="abnormalEventsEn">0</span></p>
+                
+                <p class="lang-zh">回滚率: <span id="errorRate">0%</span></p>
+                <p class="lang-en" style="display: none;">Backscroll rate: <span id="errorRateEn">0%</span></p>
+            </div>
+            
+            <h3 class="lang-zh">详细日志</h3>
+            <h3 class="lang-en" style="display: none;">Detailed Log</h3>
+            <div class="log-container" id="logContainer"></div>
+        </div>
+        
+        <div class="right-panel" id="testArea">
+            <div class="test-area-header">
+                <h2 class="lang-zh">测试区域 (滚动区)</h2>
+                <h2 class="lang-en" style="display: none;">Test Area (Scroll Zone)</h2>
+                <p class="lang-zh">在此区域内滚动您的鼠标，检测滚轮是否有回滚故障</p>
+                <p class="lang-en" style="display: none;">Scroll your mouse in this area to detect wheel malfunctions</p>
+            </div>
+            
+            <div id="infiniteContent">
+                <!-- 初始内容将由JavaScript动态生成 -->
+                <!-- Initial content will be dynamically generated by JavaScript -->
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM元素引用
+            const testArea = document.getElementById('testArea');
+            const infiniteContent = document.getElementById('infiniteContent');
+            const logContainer = document.getElementById('logContainer');
+            const totalEvents = document.getElementById('totalEvents');
+            const totalEventsEn = document.getElementById('totalEventsEn');
+            const normalEvents = document.getElementById('normalEvents');
+            const normalEventsEn = document.getElementById('normalEventsEn');
+            const abnormalEvents = document.getElementById('abnormalEvents');
+            const abnormalEventsEn = document.getElementById('abnormalEventsEn');
+            const errorRate = document.getElementById('errorRate');
+            const errorRateEn = document.getElementById('errorRateEn');
+            const startTestButton = document.getElementById('startTest');
+            const startTestButtonEn = document.getElementById('startTestEn');
+            const statusIndicator = document.getElementById('statusIndicator');
+            const toggleLanguageBtn = document.getElementById('toggleLanguage');
+            
+            // 全局变量
+            let testing = false;
+            let lastDirection = null;
+            let consecutiveCount = 0;
+            let stats = {
+                total: 0,
+                normal: 0,
+                abnormal: 0
+            };
+            let currentLanguage = 'zh'; // 默认语言
+            let contentItems = 0; // 跟踪已创建的内容项数
+            
+            // 生成初始内容
+            generateMoreContent(10);
+            
+            // 监听滚动事件以实现无限滚动
+            testArea.addEventListener('scroll', function() {
+                const scrollPosition = testArea.scrollTop;
+                const contentHeight = infiniteContent.scrollHeight;
+                const viewportHeight = testArea.clientHeight;
+                
+                // 当用户滚动接近底部时，添加更多内容
+                if (scrollPosition + viewportHeight > contentHeight - 500) {
+                    generateMoreContent(5);
+                }
+            });
+            
+            // 语言切换
+            toggleLanguageBtn.addEventListener('click', function() {
+                if (currentLanguage === 'zh') {
+                    // 切换到英文
+                    currentLanguage = 'en';
+                    toggleLanguageBtn.textContent = '中文';
+                    toggleLanguageBtn.dataset.lang = 'en';
+                } else {
+                    // 切换到中文
+                    currentLanguage = 'zh';
+                    toggleLanguageBtn.textContent = 'English';
+                    toggleLanguageBtn.dataset.lang = 'zh';
+                }
+                
+                // 更新UI语言
+                updateLanguage();
+            });
+            
+            function updateLanguage() {
+                // 隐藏所有语言元素
+                document.querySelectorAll('[class*="lang-"]').forEach(el => {
+                    if (el.classList.contains(`lang-${currentLanguage}`)) {
+                        el.style.display = '';
+                    } else {
+                        el.style.display = 'none';
+                    }
+                });
+                
+                // 更新动态生成的内容
+                updateContentLanguage();
+            }
+            
+            function updateContentLanguage() {
+                // 更新所有已生成的内容项的语言
+                document.querySelectorAll('.content-item').forEach((item, index) => {
+                    if (currentLanguage === 'zh') {
+                        item.innerHTML = `<p>滚动测试内容 #${index + 1} - 继续向下滚动来测试您的鼠标滚轮</p>`;
+                    } else {
+                        item.innerHTML = `<p>Scroll test content #${index + 1} - Keep scrolling down to test your mouse wheel</p>`;
+                    }
+                });
+            }
+            
+            // 生成更多内容
+            function generateMoreContent(count) {
+                for (let i = 0; i < count; i++) {
+                    const item = document.createElement('div');
+                    item.className = 'content-item';
+                    
+                    if (currentLanguage === 'zh') {
+                        item.innerHTML = `<p>滚动测试内容 #${contentItems + 1} - 继续向下滚动来测试您的鼠标滚轮</p>`;
+                    } else {
+                        item.innerHTML = `<p>Scroll test content #${contentItems + 1} - Keep scrolling down to test your mouse wheel</p>`;
+                    }
+                    
+                    infiniteContent.appendChild(item);
+                    contentItems++;
+                }
+            }
+            
+            // 开始/停止测试按钮事件
+            function toggleTest() {
+                if (!testing) {
+                    // 开始测试
+                    testing = true;
+                    
+                    if (currentLanguage === 'zh') {
+                        startTestButton.textContent = '停止测试';
+                        statusIndicator.querySelector('.lang-zh').textContent = '测试进行中...';
+                    } else {
+                        startTestButtonEn.textContent = 'Stop Test';
+                        statusIndicator.querySelector('.lang-en').textContent = 'Testing in progress...';
+                    }
+                    
+                    statusIndicator.classList.add('testing');
+                    
+                    // 重置统计数据
+                    stats = { total: 0, normal: 0, abnormal: 0 };
+                    updateStats();
+                    logContainer.innerHTML = '';
+                    lastDirection = null;
+                    consecutiveCount = 0;
+                    
+                    addLog(currentLanguage === 'zh' ? '测试已开始，请在测试区域内滚动鼠标' : 'Test started, please scroll in the test area', 'normal');
+                } else {
+                    // 停止测试
+                    testing = false;
+                    
+                    if (currentLanguage === 'zh') {
+                        startTestButton.textContent = '开始测试';
+                        statusIndicator.querySelector('.lang-zh').textContent = '测试已停止';
+                    } else {
+                        startTestButtonEn.textContent = 'Start Test';
+                        statusIndicator.querySelector('.lang-en').textContent = 'Test stopped';
+                    }
+                    
+                    statusIndicator.classList.remove('testing');
+                    
+                    addLog(currentLanguage === 'zh' ? '测试已停止' : 'Test stopped', 'normal');
+                }
+            }
+            
+            startTestButton.addEventListener('click', toggleTest);
+            startTestButtonEn.addEventListener('click', toggleTest);
+            
+            // 滚轮事件监听
+            testArea.addEventListener('wheel', function(event) {
+                if (!testing) return;
+                
+                const directionZh = event.deltaY > 0 ? '向下' : '向上';
+                const directionEn = event.deltaY > 0 ? 'down' : 'up';
+                const direction = currentLanguage === 'zh' ? directionZh : directionEn;
+                
+                stats.total++;
+                
+                if (lastDirection === null) {
+                    // 第一次滚动
+                    lastDirection = direction;
+                    consecutiveCount = 1;
+                    
+                    if (currentLanguage === 'zh') {
+                        addLog(`检测到${direction}滚动`, 'normal');
+                    } else {
+                        addLog(`Detected scrolling ${direction}`, 'normal');
+                    }
+                    
+                    stats.normal++;
+                } else if (direction === lastDirection) {
+                    // 方向一致，继续累加
+                    consecutiveCount++;
+                    stats.normal++;
+                    // 不记录每次正常滚动，避免日志过多
+                    if (consecutiveCount % 5 === 0) {
+                        if (currentLanguage === 'zh') {
+                            addLog(`连续${consecutiveCount}次${direction}滚动`, 'normal');
+                        } else {
+                            addLog(`${consecutiveCount} consecutive ${direction} scrolls`, 'normal');
+                        }
+                    }
+                } else {
+                    // 方向改变
+                    if (consecutiveCount >= 3) {
+                        // 如果之前有连续3次以上相同方向，这次方向改变可能是用户主动改变的
+                        if (currentLanguage === 'zh') {
+                            addLog(`方向改变: 从${lastDirection}变为${direction}，可能是用户主动改变`, 'normal');
+                        } else {
+                            const lastDirEn = lastDirection === '向下' ? 'down' : (lastDirection === '向上' ? 'up' : lastDirection);
+                            const currDirEn = direction === '向下' ? 'down' : (direction === '向上' ? 'up' : direction);
+                            addLog(`Direction change: from ${lastDirEn} to ${currDirEn}, likely intentional`, 'normal');
+                        }
+                        
+                        stats.normal++;
+                        lastDirection = direction;
+                        consecutiveCount = 1;
+                    } else {
+                        // 如果之前连续次数少于3次，这次方向改变可能是回滚故障
+                        if (currentLanguage === 'zh') {
+                            addLog(`检测到可能的回滚故障: 从${lastDirection}意外变为${direction}`, 'error');
+                        } else {
+                            const lastDirEn = lastDirection === '向下' ? 'down' : (lastDirection === '向上' ? 'up' : lastDirection);
+                            const currDirEn = direction === '向下' ? 'down' : (direction === '向上' ? 'up' : direction);
+                            addLog(`Detected possible backscroll malfunction: unexpected change from ${lastDirEn} to ${currDirEn}`, 'error');
+                        }
+                        
+                        stats.abnormal++;
+                        lastDirection = direction;
+                        consecutiveCount = 1;
+                    }
+                }
+                
+                updateStats();
+            });
+            
+            // 添加日志
+            function addLog(message, type) {
+                const logEntry = document.createElement('p');
+                logEntry.className = type;
+                const timestamp = new Date().toLocaleTimeString();
+                logEntry.textContent = `[${timestamp}] ${message}`;
+                logContainer.appendChild(logEntry);
+                // 滚动到底部
+                logContainer.scrollTop = logContainer.scrollHeight;
+            }
+            
+            // 更新统计数据
+            function updateStats() {
+                totalEvents.textContent = stats.total;
+                totalEventsEn.textContent = stats.total;
+                normalEvents.textContent = stats.normal;
+                normalEventsEn.textContent = stats.normal;
+                abnormalEvents.textContent = stats.abnormal;
+                abnormalEventsEn.textContent = stats.abnormal;
+                
+                const rate = stats.total > 0 ? (stats.abnormal / stats.total * 100).toFixed(2) : '0';
+                errorRate.textContent = `${rate}%`;
+                errorRateEn.textContent = `${rate}%`;
+            }
+        });
+    </script>
+</body>
+</html>
