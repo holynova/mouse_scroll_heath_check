@@ -272,7 +272,7 @@
             let contentItems = 0; // 跟踪已创建的内容项数
             
             // 生成初始内容
-            generateMoreContent(10);
+            generateMoreContent(100);
             
             // 监听滚动事件以实现无限滚动
             testArea.addEventListener('scroll', function() {
@@ -282,7 +282,7 @@
                 
                 // 当用户滚动接近底部时，添加更多内容
                 if (scrollPosition + viewportHeight > contentHeight - 500) {
-                    generateMoreContent(5);
+                    generateMoreContent(50);
                 }
             });
             
