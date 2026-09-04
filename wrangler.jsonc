@@ -1,0 +1,14 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "mouse-scroll-heath-check",
+  "compatibility_date": "2026-09-04",
+  "assets": {
+    "directory": "."
+  },
+  "routes": [
+    {
+      "pattern": "mouse-scroll-heath-check.xiaosang.cc",
+      "custom_domain": true
+    }
+  ]
+}
