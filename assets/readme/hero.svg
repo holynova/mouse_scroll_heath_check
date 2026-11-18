@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="1200" height="360" viewBox="0 0 1200 360"
+     role="img" aria-labelledby="title desc">
+  <title id="title">鼠标滚轮检测器 Mouse Wheel Detector — 鼠标滚轮回滚故障检测</title>
+  <desc id="desc">浅蓝底标题：鼠标滚轮检测器，副标题滚轮回滚，一测便知；右侧是一只鼠标与滚动方向序列面板：8 个方向箭头中第 3 个是红色上箭头，代表一次回滚，下方统计总 8、正常 6、回滚 2、25.00%。</desc>
+
+  <rect width="1200" height="360" rx="26" fill="#f0f9ff"/>
+
+  <g id="title-block" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif">
+    <text x="56" y="62" font-size="19" letter-spacing="3" fill="#475569">鼠标滚轮健康检测 · WHEEL HEALTH CHECK</text>
+    <text x="56" y="128" font-size="62" font-weight="700" fill="#0f172a">鼠标滚轮检测器</text>
+    <text x="56" y="168" font-size="23" fill="#1e293b">MOUSE WHEEL DETECTOR — 滚轮回滚，一测便知</text>
+    <text x="56" y="204" font-size="19" fill="#475569">单文件工具：朝一个方向滚，方向突然反跳就记一次回滚。</text>
+    <g id="chips" font-size="18" fill="#0f172a" text-anchor="middle">
+      <g><rect x="56" y="238" width="126" height="36" rx="18" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/><text x="119" y="262">单文件 · 零依赖</text></g>
+      <g><rect x="194" y="238" width="126" height="36" rx="18" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/><text x="257" y="262">回滚故障检测</text></g>
+      <g><rect x="332" y="238" width="144" height="36" rx="18" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/><text x="404" y="262">实时统计 + 日志</text></g>
+      <g><rect x="488" y="238" width="90" height="36" rx="18" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/><text x="533" y="262">中英双语</text></g>
+    </g>
+  </g>
+
+  <g id="mouse-demo">
+    <g id="mouse">
+      <rect x="824" y="72" width="104" height="180" rx="52" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+      <rect x="866" y="96" width="20" height="44" rx="10" fill="#3b82f6"/>
+      <line x1="824" y1="156" x2="928" y2="156" stroke="#e2e8f0" stroke-width="2"/>
+    </g>
+    <g id="track-panel" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif">
+      <rect x="960" y="56" width="184" height="212" rx="12" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+      <text x="1052" y="88" font-size="18" fill="#334155" text-anchor="middle">滚动方向序列</text>
+      <g id="arrows" font-size="24" text-anchor="middle">
+        <text x="978" y="138" fill="#166534">↓</text>
+        <text x="998" y="138" fill="#166534">↓</text>
+        <text x="1018" y="138" fill="#dc2626">↑</text>
+        <text x="1038" y="138" fill="#166534">↓</text>
+        <text x="1058" y="138" fill="#166534">↓</text>
+        <text x="1078" y="138" fill="#166534">↓</text>
+        <text x="1098" y="138" fill="#166534">↓</text>
+        <text x="1118" y="138" fill="#166534">↓</text>
+      </g>
+      <text x="1052" y="190" font-size="18" fill="#0f172a" text-anchor="middle">总 8 · 正常 6</text>
+      <text x="1052" y="220" font-size="18" fill="#dc2626" text-anchor="middle">回滚 2 · 25.00%</text>
+      <text x="1052" y="250" font-size="18" fill="#475569" text-anchor="middle">红箭头 = 回滚故障</text>
+    </g>
+    <text x="980" y="320" font-size="18" fill="#475569" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif">连续不足 3 次就变向，即判回滚故障</text>
+  </g>
+</svg>
